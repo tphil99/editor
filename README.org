@@ -1,0 +1,24 @@
+* Summary
+
+~./editor <filename>~ will open ~<filename>~ in the editor.
+You can build it from source by running ~make~.
+
+Keybindings:
+
+| Ctrl-S | Save           |
+| Ctrl-Q | Quit           |
+| Ctrl-L | Open new file  |
+| Ctrl-K | Kill line      |
+| Ctrl-Y | Find/search    |
+| Ctrl-F | Forward char   |
+| Ctrl-B | Backward char  |
+| Ctrl-N | Forward line   |
+| Ctrl-P | Backward line  |
+| Ctrl-H | Delet backward |
+| Ctrl-D | Delete forward |
+
+* Features to add
+
+- kill ring: store the last <n> killed lines, and allow pasting them back into the file
+- rename file
+- etc.    
