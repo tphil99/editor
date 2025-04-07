@@ -17,6 +17,81 @@ Keybindings:
 | Ctrl-H | Delet backward |
 | Ctrl-D | Delete forward |
 
+* Summary of how it works
+
+At startup, put the terminal into raw mode, and ensure it will revert
+to its original mode when the program terminates.
+
+A ~struct editor~ represents the key information that is modified by keypresses and
+drawn onto the terminal screen.
+
+#+begin_src C
+struct editor {
+    struct buffer buffer;
+    struct terminal terminal;
+    char statusmsg[80];
+    time_t statusmsg_time;
+};
+
+struct buffer {
+    struct point point;    
+    struct line *lines;      
+    int numlines;	   
+    int dirty;      /* file modified */
+    char *filename;
+    struct editorSyntax *syntax;    /* Current syntax highlight, or NULL. */
+    struct point offset; /* imagine entire buffer displayed, but top-left of screen is at offest */
+};
+#+end_src
+
+Loop around the following three functions:
+
+1. ~editor_refresh()~: draw the current state of the ~struct editor~ 
+2. ~term_read(STDIN_FILENO)~: wait for and then get the next character entered at the terminal
+3. ~editor_process(char)~: take action (modify the ~struct editor~) based on char
+
+** editor_refresh()
+
+This function builds up and writes to the terminal a string that will make it display the editor state.
+The string is a mixture of terminal VT100 control sequences, and printable characters.
+It dynamically re-allocates when its length exceeds its capacity.
+
+** term_read()
+
+read a character from the terminal.
+If it is an ~ESC~, try to read the full escape sequence, otherwise, just return the character.
+
+** editor_process()
+
+#+begin_src C
+static void (*eventHandler[256])(void) = {
+  [CTRL_N] = editor_point_next_line,
+  [CTRL_P] = editor_point_prev_line,
+  [CTRL_F] = editor_point_forward_char,
+  [CTRL_B] = editor_point_backward_char,
+  [CTRL_D] = editorDelForwardChar,
+  [CTRL_L] = buffer_find_file_interactive,
+  [CTRL_Y] = editorFind,
+  [CTRL_M] = editorInsertNewline,
+  [CTRL_H] = editorDelChar,
+  [DEL]    = editorDelChar, 
+  [CTRL_S] = buffer_write,
+  [CTRL_K] = buffer_kill_line_interactive,
+  [CTRL_Q] = editor_quit,
+};
+
+void editor_process(int c) {
+    if (isprint(c)) editorInsertChar(c);
+    else if (eventHandler[c] != NULL) eventHandler[c]();
+    else editor_message("unknown command. HELP: C-s: save | C-q: quit | C-f: find");
+    if (c != CTRL_Q) quit_times = KILO_QUIT_TIMES; /* reset static var */
+}
+#+end_src
+
+* Bugs to fix
+
+- handle when line goes over end of window
+
 * Features to add
 
 - kill ring: store the last <n> killed lines, and allow pasting them back into the file

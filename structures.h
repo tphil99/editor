@@ -28,8 +28,8 @@ struct point {
 
 struct buffer {
     struct point point;    
-    struct line *lines;      /* row renamed to lines */
-    int numlines;	     /* numrows renamed to numlines */
+    struct line *lines;
+    int numlines;
     int dirty;      /* file modified */
     char *filename;
     struct editorSyntax *syntax;    /* Current syntax highlight, or NULL. */
