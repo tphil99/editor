@@ -32,7 +32,7 @@ void buffer_render_line(struct line *line) {
 
     unsigned long long allocsize =
         (unsigned long long) line->size + tabs*8 + nonprint*9 + 1;
-    if (allocsize > 50) { /* UINT32_MAX */
+    if (allocsize > INT32_MAX) { 
         printf("file lines are too long ... quiting\n");
 	sleep(3);
         exit(1);
