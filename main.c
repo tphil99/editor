@@ -7,7 +7,7 @@
 
 int main(int argc, char **argv) {
     if (argc != 2) {
-        fprintf(stderr,"Usage: ted <filename>\n");
+        fprintf(stderr,"Usage: editor <filename>\n");
         exit(1);
     }
     term_setup();
